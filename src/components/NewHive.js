@@ -37,8 +37,8 @@ export default class NewHive extends React.Component {
     var region = {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
-      latitudeDelta: 0.0461,
-      longitudeDelta: 0.0211
+      latitudeDelta: 0.0115,
+      longitudeDelta: 0.0055
     };
 
     var myPosition = {

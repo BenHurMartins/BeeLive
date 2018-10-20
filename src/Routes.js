@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, Image, Platform, YellowBox } from "react-native";
+import { StyleSheet, View, Image, Platform, YellowBox } from "react-native";
 import { Icon } from "react-native-elements";
 import {
   createSwitchNavigator,
@@ -24,10 +24,12 @@ YellowBox.ignoreWarnings([
 
 const customHeader = () => {
   return (
-    <Image
-      style={{ width: 300, height: 90 }}
-      source={require("../assets/logo.png")}
-    />
+    <View style={{ alignItems: "flex-start", flex: 1, paddingLeft: 35 }}>
+      <Image
+        style={{ width: 200, height: 60 }}
+        source={require("../assets/logo.png")}
+      />
+    </View>
   );
 };
 
@@ -38,7 +40,7 @@ const HomeStack = createStackNavigator({
       headerTitle: customHeader(),
       headerTintColor: "#4A4A4A",
       headerStyle: {
-        height: 110,
+        height: 90,
         backgroundColor: "#FBE312",
         elevation: 0,
         shadowOpacity: Platform.OS === "ios" ? 8 : 0,
