@@ -6,7 +6,14 @@ import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
 import { toggleNewHiveFormModal } from "../actions/ModalActions";
+import { newHive } from "../actions/HiveActions";
 import NewHiveFormModal from "./modal/NewHiveFormModal";
+
+const GEOLOCATION_OPTIONS = {
+  enableHighAccuracy: true,
+  timeout: 20000,
+  maximumAge: 1000
+};
 
 class NewHive extends React.Component {
   constructor(props) {
@@ -20,13 +27,27 @@ class NewHive extends React.Component {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421
       },
-      myPosition: {}
+      myPosition: {
+        latitude: 37.78825,
+        longitude: -122.4324
+      }
     };
   }
+  locationChanged = location => {
+    var region = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.0057,
+      longitudeDelta: 0.0027
+    };
 
-  onRegionChange(region) {
-    this.setState({ region });
-  }
+    var myPosition = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    };
+
+    this.setState({ myPosition, region });
+  };
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -41,8 +62,8 @@ class NewHive extends React.Component {
     var region = {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
-      latitudeDelta: 0.0115,
-      longitudeDelta: 0.0055
+      latitudeDelta: 0.0028,
+      longitudeDelta: 0.0013
     };
 
     var myPosition = {
@@ -50,8 +71,17 @@ class NewHive extends React.Component {
       longitude: location.coords.longitude
     };
 
+    console.log(myPosition);
+
     this.setState({ region, myPosition });
   };
+
+  _handleNewMarker() {
+    var coordinates = this.state.myPosition;
+    var newHive = { lastSeen: "2018-10-20", coordinates };
+
+    this.props.newHive(newHive);
+  }
 
   componentWillMount() {
     this.setState({ active: false });
@@ -62,7 +92,10 @@ class NewHive extends React.Component {
           "Oops, this will not work on Sketch in an Android emulator. Try it on your device!"
       });
     } else {
-      this._getLocationAsync();
+      //   Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+      setInterval(() => {
+        this._getLocationAsync();
+      }, 5000);
     }
   }
 
@@ -74,7 +107,6 @@ class NewHive extends React.Component {
           provider={MapView.PROVIDER_GOOGLE}
           style={styles.map}
           region={this.state.region}
-          // onRegionChange={region => this.onRegionChange(region)}
         >
           <MapView.Marker
             coordinate={this.state.myPosition}
@@ -86,6 +118,17 @@ class NewHive extends React.Component {
               source={require("../../assets/my-position-marker.png")}
             />
           </MapView.Marker>
+          {this.props.hives.map(hive => (
+            <MapView.Marker
+              coordinate={hive.coordinates}
+              title={"Visto pela última vez: " + hive.lastSeen}
+            >
+              <Image
+                style={{ width: 35, height: 35 }}
+                source={require("../../assets/hive-map-icon.png")}
+              />
+            </MapView.Marker>
+          ))}
         </MapView>
         <Fab
           active={this.state.active}
@@ -100,6 +143,7 @@ class NewHive extends React.Component {
             style={{ backgroundColor: "transparent" }}
             onPress={() => {
               this.props.toggleNewHiveFormModal();
+              this._handleNewMarker();
             }}
           >
             <Image
@@ -127,11 +171,12 @@ const styles = StyleSheet.create({
 
 mapStateToProps = state => {
   return {
-    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal
+    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal,
+    hives: state.HiveReducer.hives
   };
 };
 
 export default connect(
   mapStateToProps,
-  { toggleNewHiveFormModal }
+  { toggleNewHiveFormModal, newHive }
 )(NewHive);
