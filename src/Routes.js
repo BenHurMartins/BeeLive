@@ -83,9 +83,11 @@ const MainTab = createTabNavigator(
         title: "Home",
         tabBarIcon: ({ focused, tintColor }) => {
           if (focused) {
-            return <Icon name={"home"} color={"#4A4A4A"} />;
+            return (
+              <Icon type={"font-awesome"} name={"forumbee"} color={"#4A4A4A"} />
+            );
           } else {
-            return <Icon name={"home"} />;
+            return <Icon type={"font-awesome"} name={"forumbee"} />;
           }
         }
       }
@@ -96,9 +98,9 @@ const MainTab = createTabNavigator(
         title: "Nova Colméia",
         tabBarIcon: ({ focused, tintColor }) => {
           if (focused) {
-            return <Icon name={"edit"} color={"#4A4A4A"} />;
+            return <Icon name={"map"} color={"#4A4A4A"} />;
           } else {
-            return <Icon name={"edit"} />;
+            return <Icon name={"map"} />;
           }
         }
       }

@@ -3,8 +3,12 @@ import { StyleSheet, Text, View, Platform, Image } from "react-native";
 import { MapView, Constants, Location, Permissions } from "expo";
 import { Button, Fab } from "native-base";
 import { Icon } from "react-native-elements";
+import { connect } from "react-redux";
 
-export default class NewHive extends React.Component {
+import { toggleNewHiveFormModal } from "../actions/ModalActions";
+import NewHiveFormModal from "./modal/NewHiveFormModal";
+
+class NewHive extends React.Component {
   constructor(props) {
     super(props);
 
@@ -94,7 +98,9 @@ export default class NewHive extends React.Component {
           <Icon name="add" color={"#4A4A4A"} />
           <Button
             style={{ backgroundColor: "transparent" }}
-            onPress={() => console.log("teste")}
+            onPress={() => {
+              this.props.toggleNewHiveFormModal();
+            }}
           >
             <Image
               style={{ width: 35, height: 35 }}
@@ -102,6 +108,7 @@ export default class NewHive extends React.Component {
             />
           </Button>
         </Fab>
+        <NewHiveFormModal />
       </View>
     );
   }
@@ -117,3 +124,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject
   }
 });
+
+mapStateToProps = state => {
+  return {
+    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { toggleNewHiveFormModal }
+)(NewHive);
