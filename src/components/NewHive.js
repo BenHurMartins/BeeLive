@@ -50,6 +50,8 @@ export default class NewHive extends React.Component {
   };
 
   componentWillMount() {
+    this.setState({ active: false });
+
     if (Platform.OS === "android" && !Constants.isDevice) {
       this.setState({
         errorMessage:
@@ -77,7 +79,7 @@ export default class NewHive extends React.Component {
           >
             <Image
               style={{ width: 35, height: 55 }}
-              source={require("../assets/my-position-marker.png")}
+              source={require("../../assets/my-position-marker.png")}
             />
           </MapView.Marker>
         </MapView>
@@ -96,7 +98,7 @@ export default class NewHive extends React.Component {
           >
             <Image
               style={{ width: 35, height: 35 }}
-              source={require("../assets/hive-map-icon.png")}
+              source={require("../../assets/hive-map-icon.png")}
             />
           </Button>
         </Fab>
