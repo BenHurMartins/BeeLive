@@ -1,14 +1,37 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
+import { ButtonGroup, Text, Button } from "react-native-elements";
+import { Picker, Form, Icon } from "native-base";
 import { toggleNewHiveFormModal } from "../../actions/ModalActions";
+import { setNewHive } from "../../actions/HiveActions";
 import { connect } from "react-redux";
 
 class NewHiveFormModal extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      buttons: ["Pequena", "Média", "Grande"],
+      selectedIndex: 0,
+      beeSpecies: ""
+    };
+  }
+
+  _handleNewHive() {
+    console.log("actual new hive");
+    console.log(this.props.newHive);
+
+    var newHive = this.props.newHive;
+
+    newHive = {
+      ...newHive,
+      hiveSize: this.state.selectedIndex + 1,
+      beeSpecies: this.state.beeSpecies.value,
+      date: Date.now().toLocaleString()
+    };
+
+    this.props.setNewHive(newHive);
   }
 
   render() {
@@ -20,22 +43,54 @@ class NewHiveFormModal extends Component {
           animationOut={"slideOutRight"}
         >
           <View style={styles.mainView}>
-            <View>
-              <Text style={styles.mainModalText}>Oi!</Text>
-              <Text style={styles.secondaryModalText}>
-                Nosso App está aqui para te ajudar a vender suas coisas sem sair
-                de casa, chega de ter que marcar encontros em estações de metrô
-                ou praças. Venda primeiro em seu próprio condomínio. Antes de
-                começar precisamos que você complete seu cadastro.
-              </Text>
-            </View>
-          </View>
-          <View>
+            <Form>
+              <Text style={styles.label}>Qual é o tamanho da colméia?</Text>
+              <ButtonGroup
+                onPress={selectedIndex => this.setState({ selectedIndex })}
+                selectedIndex={this.state.selectedIndex}
+                buttons={this.state.buttons}
+                containerStyle={{ height: 50 }}
+                selectedButtonStyle={{ backgroundColor: "#FBE312" }}
+              />
+              <Text style={styles.label}>Qual é o tipo de abelhas?</Text>
+              <Picker
+                iosIcon={<Icon name="ios-arrow-down-outline" />}
+                placeholder="Escolha uma espécie"
+                note
+                mode="dropdown"
+                value={this.state.beeSpecies}
+                style={{
+                  width: 300,
+                  height: 50,
+                  borderStyle: "solid",
+                  borderBottomColor: "#FBE312"
+                }}
+                selectedValue={this.state.beeSpecies}
+                onValueChange={selected =>
+                  this.setState({ beeSpecies: selected })
+                }
+                hideUnderline
+                itemTextStyle={{ color: "#4A4A4A" }}
+              >
+                <Picker.Item label="Italiana" value="italiana" />
+                <Picker.Item label="Alemã" value="alema" />
+                <Picker.Item label="Carniça" value="carnica" />
+                <Picker.Item label="Caucasiana" value="caucasiana" />
+                <Picker.Item label="Européia" value="europeia" />
+                <Picker.Item label="Africana" value="africana" />
+                <Picker.Item label="Oriental" value="oriental" />
+                <Picker.Item label="Sem Ferrão" value="semFerrao" />
+                <Picker.Item label="Não Sei" value="idk" />
+              </Picker>
+            </Form>
             <TouchableOpacity
               style={styles.confirmButton}
-              onPress={() => this.props.toggleNewHiveFormModal()}
+              onPress={() => {
+                this.props.toggleNewHiveFormModal();
+                this._handleNewHive();
+              }}
             >
-              <Text style={styles.buttonText}>Ok</Text>
+              <Text style={styles.buttonText}>Enviar Dados</Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -49,14 +104,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 22,
     justifyContent: "center",
-    borderTopRightRadius: 4,
-    borderTopLeftRadius: 4,
+    borderRadius: 4,
     borderColor: "rgba(0, 0, 0, 0.1)"
   },
-  mainModalText: {
-    fontSize: 17,
+  label: {
+    fontSize: 20,
     margin: 7,
-    textAlign: "center"
+    color: "#4A4A4A"
   },
   secondaryModalText: {
     fontSize: 13,
@@ -64,12 +118,11 @@ const styles = StyleSheet.create({
     textAlign: "justify"
   },
   confirmButton: {
-    height: 55,
+    height: 50,
     backgroundColor: "#FBE312",
     justifyContent: "center",
     alignItems: "center",
-    borderBottomRightRadius: 4,
-    borderBottomLeftRadius: 4
+    borderRadius: 4
   },
   buttonText: {
     color: "#4A4A4A",
@@ -79,11 +132,12 @@ const styles = StyleSheet.create({
 
 mapStateToProps = state => {
   return {
-    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal
+    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal,
+    newHive: state.HiveReducer.newHive
   };
 };
 
 export default connect(
   mapStateToProps,
-  { toggleNewHiveFormModal }
+  { toggleNewHiveFormModal, setNewHive }
 )(NewHiveFormModal);

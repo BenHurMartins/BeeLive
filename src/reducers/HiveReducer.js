@@ -1,5 +1,9 @@
 const INITIAL_STATE = {
-  hives: [],
+  hives: [
+    { coordinates: { latitude: -15.756566, longitude: -47.877536 } },
+    { coordinates: { latitude: -15.757567, longitude: -47.878195 } },
+    { coordinates: { latitude: -15.756805, longitude: -47.878488 } }
+  ],
   newHive: ""
 };
 

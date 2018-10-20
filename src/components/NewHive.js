@@ -6,7 +6,7 @@ import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
 import { toggleNewHiveFormModal } from "../actions/ModalActions";
-import { newHive } from "../actions/HiveActions";
+import { newHive, prepareNewHive } from "../actions/HiveActions";
 import NewHiveFormModal from "./modal/NewHiveFormModal";
 
 const GEOLOCATION_OPTIONS = {
@@ -71,16 +71,14 @@ class NewHive extends React.Component {
       longitude: location.coords.longitude
     };
 
-    console.log(myPosition);
-
     this.setState({ region, myPosition });
   };
 
   _handleNewMarker() {
     var coordinates = this.state.myPosition;
-    var newHive = { lastSeen: "2018-10-20", coordinates };
+    var newHive = { coordinates };
 
-    this.props.newHive(newHive);
+    this.props.prepareNewHive(newHive);
   }
 
   componentWillMount() {
@@ -118,17 +116,19 @@ class NewHive extends React.Component {
               source={require("../../assets/my-position-marker.png")}
             />
           </MapView.Marker>
-          {this.props.hives.map(hive => (
-            <MapView.Marker
-              coordinate={hive.coordinates}
-              title={"Visto pela última vez: " + hive.lastSeen}
-            >
-              <Image
-                style={{ width: 35, height: 35 }}
-                source={require("../../assets/hive-map-icon.png")}
-              />
-            </MapView.Marker>
-          ))}
+          {this.props.hives.map(hive => {
+            return (
+              <MapView.Marker
+                coordinate={hive.coordinates}
+                title={"Visto pela última vez: " + hive.lastSeen}
+              >
+                <Image
+                  style={{ width: 35, height: 35 }}
+                  source={require("../../assets/hive-map-icon.png")}
+                />
+              </MapView.Marker>
+            );
+          })}
         </MapView>
         <Fab
           active={this.state.active}
@@ -178,5 +178,5 @@ mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { toggleNewHiveFormModal, newHive }
+  { toggleNewHiveFormModal, newHive, prepareNewHive }
 )(NewHive);

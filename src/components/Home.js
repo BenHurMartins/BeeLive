@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Image, View } from "react-native";
+import { Text } from "react-native-elements";
 
 export default class Home extends React.Component {
   render() {
@@ -9,6 +10,10 @@ export default class Home extends React.Component {
           style={{ width: 190, height: 190 }}
           source={require("../../assets/bee-home.png")}
         />
+        <Text h4 style={styles.label}>
+          {" "}
+          Oi Luís, você já nos ajudou a cadastrar 13 coméias!
+        </Text>
       </View>
     );
   }
@@ -20,5 +25,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center"
+  },
+  label: {
+    margin: 30,
+    color: "#4A4A4A",
+    textAlign: "center"
   }
 });
