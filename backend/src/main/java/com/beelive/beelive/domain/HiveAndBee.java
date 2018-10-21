@@ -2,8 +2,10 @@ package com.beelive.beelive.domain;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
@@ -13,7 +15,8 @@ import lombok.Data;
 @Entity
 public class HiveAndBee {
 
-	private @Id @GeneratedValue Long id;
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
 	private Date dateCreation;
 	private Date dateFinal;
@@ -21,7 +24,7 @@ public class HiveAndBee {
 	private String beeSpecies;
 	private Boolean hive;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private Coordinates coordinates;
 
 }
