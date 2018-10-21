@@ -82,8 +82,6 @@ class NewHive extends React.Component {
 
   _handleMarkers(marker) {
     if (marker.hive) {
-      console.log("entrou aqui");
-
       return (
         <MapView.Marker
           coordinate={marker.coordinates}
