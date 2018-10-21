@@ -1,8 +1,14 @@
 import React from "react";
 import { StyleSheet, Image, View } from "react-native";
 import { Text } from "react-native-elements";
+import { connect } from "react-redux";
+import { getMarkers } from "../actions/MarkerActions";
 
-export default class Home extends React.Component {
+class Home extends React.Component {
+  componentDidMount() {
+    this.props.getMarkers();
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -32,3 +38,12 @@ const styles = StyleSheet.create({
     textAlign: "center"
   }
 });
+
+mapStateToProps = state => {
+  return {};
+};
+
+export default connect(
+  mapStateToProps,
+  { getMarkers }
+)(Home);

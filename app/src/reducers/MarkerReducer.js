@@ -26,6 +26,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, newMarker: action.payload };
     case types.NEW_MARKER:
       return { ...state, markers: [...state.markers, action.payload] };
+    case types.SET_MARKERS:
+      return { ...state, markers: action.payload };
     default:
       return state;
   }

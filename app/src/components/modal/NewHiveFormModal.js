@@ -25,7 +25,7 @@ class NewHiveFormModal extends Component {
       ...newMarker,
       size: this.state.selectedIndex + 1,
       beeSpecies: this.state.beeSpecies.value,
-      hive: false
+      hive: true
     };
 
     this.props.setNewMarker(newMarker);
