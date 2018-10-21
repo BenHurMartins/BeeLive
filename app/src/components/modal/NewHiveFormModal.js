@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
 import { ButtonGroup, Text, Button } from "react-native-elements";
 import { Picker, Form, Icon } from "native-base";
-import { toggleNewBeeFormModal } from "../../actions/ModalActions";
+import { toggleNewHiveFormModal } from "../../actions/ModalActions";
 import { setNewMarker } from "../../actions/MarkerActions";
 import { connect } from "react-redux";
 
@@ -12,7 +12,7 @@ class NewHiveFormModal extends Component {
     super(props);
 
     this.state = {
-      buttons: ["Uma :(", "Algumas", "Um Enxame"],
+      buttons: ["Pequena", "Média", "Grande"],
       selectedIndex: 0,
       beeSpecies: ""
     };
@@ -23,10 +23,9 @@ class NewHiveFormModal extends Component {
 
     newMarker = {
       ...newMarker,
-      hive: false,
       size: this.state.selectedIndex + 1,
       beeSpecies: this.state.beeSpecies.value,
-      date: Date.now().toLocaleString()
+      hive: false
     };
 
     this.props.setNewMarker(newMarker);
@@ -36,13 +35,13 @@ class NewHiveFormModal extends Component {
     return (
       <View>
         <Modal
-          isVisible={this.props.showNewBeeFormModal}
+          isVisible={this.props.showNewHiveFormModal}
           animationIn={"slideInLeft"}
           animationOut={"slideOutRight"}
         >
           <View style={styles.mainView}>
             <Form>
-              <Text style={styles.label}>Quantas abelhas você viu?</Text>
+              <Text style={styles.label}>Qual é o tamanho da colméia?</Text>
               <ButtonGroup
                 onPress={selectedIndex => this.setState({ selectedIndex })}
                 selectedIndex={this.state.selectedIndex}
@@ -50,7 +49,7 @@ class NewHiveFormModal extends Component {
                 containerStyle={{ height: 50 }}
                 selectedButtonStyle={{ backgroundColor: "#FBE312" }}
               />
-              <Text style={styles.label}>Qual é o tipo da/as abelhas?</Text>
+              <Text style={styles.label}>Qual é o tipo de abelhas?</Text>
               <Picker
                 iosIcon={<Icon name="ios-arrow-down-outline" />}
                 placeholder="Escolha uma espécie"
@@ -84,7 +83,7 @@ class NewHiveFormModal extends Component {
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={() => {
-                this.props.toggleNewBeeFormModal();
+                this.props.toggleNewHiveFormModal();
                 this._handleNewHive();
               }}
             >
@@ -130,12 +129,12 @@ const styles = StyleSheet.create({
 
 mapStateToProps = state => {
   return {
-    showNewBeeFormModal: state.ModalReducer.showNewBeeFormModal,
+    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal,
     newMarker: state.MarkerReducer.newMarker
   };
 };
 
 export default connect(
   mapStateToProps,
-  { toggleNewBeeFormModal, setNewMarker }
+  { toggleNewHiveFormModal, setNewMarker }
 )(NewHiveFormModal);
