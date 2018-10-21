@@ -5,15 +5,13 @@ import { Button, Fab } from "native-base";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
-import { toggleNewHiveFormModal } from "../actions/ModalActions";
-import { newHive, prepareNewHive } from "../actions/HiveActions";
+import {
+  toggleNewHiveFormModal,
+  toggleNewBeeFormModal
+} from "../actions/ModalActions";
+import { prepareNewMarker } from "../actions/MarkerActions";
 import NewHiveFormModal from "./modal/NewHiveFormModal";
-
-const GEOLOCATION_OPTIONS = {
-  enableHighAccuracy: true,
-  timeout: 20000,
-  maximumAge: 1000
-};
+import NewBeeFormModal from "./modal/NewBeeFormModal";
 
 class NewHive extends React.Component {
   constructor(props) {
@@ -22,8 +20,8 @@ class NewHive extends React.Component {
     this.state = {
       active: "false",
       region: {
-        latitude: 37.78825,
-        longitude: -122.4324,
+        latitude: 0,
+        longitude: 0,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421
       },
@@ -33,23 +31,8 @@ class NewHive extends React.Component {
       }
     };
   }
-  locationChanged = location => {
-    var region = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0057,
-      longitudeDelta: 0.0027
-    };
 
-    var myPosition = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude
-    };
-
-    this.setState({ myPosition, region });
-  };
-
-  _getLocationAsync = async () => {
+  _getRegion = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== "granted") {
       this.setState({
@@ -65,20 +48,92 @@ class NewHive extends React.Component {
       latitudeDelta: 0.0028,
       longitudeDelta: 0.0013
     };
+    this.setState({ region });
+  };
+
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== "granted") {
+      this.setState({
+        errorMessage: "Permission to access location was denied"
+      });
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
 
     var myPosition = {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude
     };
 
-    this.setState({ region, myPosition });
+    this.setState({ myPosition });
   };
 
-  _handleNewMarker() {
+  _handleNewMarker(type) {
     var coordinates = this.state.myPosition;
-    var newHive = { coordinates };
+    if (type == "bee") {
+      var newMarker = { coordinates, hive: false };
+    } else {
+      var newMarker = { coordinates, hive: true };
+    }
 
-    this.props.prepareNewHive(newHive);
+    this.props.prepareNewMarker(newMarker);
+  }
+
+  _handleMarkers(marker) {
+    if (marker.hive) {
+      console.log("entrou aqui");
+
+      return (
+        <MapView.Marker
+          coordinate={marker.coordinates}
+          title={"Visto pela última vez: " + marker.lastSeen}
+        >
+          <Image
+            style={{ width: 35, height: 35 }}
+            source={require("../../assets/hive-map-icon.png")}
+          />
+        </MapView.Marker>
+      );
+    } else {
+      var imageComponent = () => false;
+      switch (marker.size) {
+        case 1:
+          imageComponent = () => (
+            <Image
+              style={{ width: 35, height: 35 }}
+              source={require("../../assets/one-bee.png")}
+            />
+          );
+          break;
+        case 2:
+          imageComponent = () => (
+            <Image
+              style={{ width: 35, height: 35 }}
+              source={require("../../assets/some-bees.png")}
+            />
+          );
+          break;
+        case 3:
+          imageComponent = () => (
+            <Image
+              style={{ width: 35, height: 35 }}
+              source={require("../../assets/lot-of-bees.png")}
+            />
+          );
+          break;
+        default:
+          break;
+      }
+      return (
+        <MapView.Marker
+          coordinate={marker.coordinates}
+          title={"Visto pela última vez: " + marker.lastSeen}
+        >
+          {imageComponent()}
+        </MapView.Marker>
+      );
+    }
   }
 
   componentWillMount() {
@@ -90,7 +145,8 @@ class NewHive extends React.Component {
           "Oops, this will not work on Sketch in an Android emulator. Try it on your device!"
       });
     } else {
-      //   Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+      this._getRegion();
+
       setInterval(() => {
         this._getLocationAsync();
       }, 5000);
@@ -106,28 +162,14 @@ class NewHive extends React.Component {
           style={styles.map}
           region={this.state.region}
         >
-          <MapView.Marker
-            coordinate={this.state.myPosition}
-            title={"To aqui"}
-            description={"To Aqui mesmo"}
-          >
+          <MapView.Marker coordinate={this.state.myPosition}>
             <Image
               style={{ width: 35, height: 55 }}
               source={require("../../assets/my-position-marker.png")}
             />
           </MapView.Marker>
-          {this.props.hives.map(hive => {
-            return (
-              <MapView.Marker
-                coordinate={hive.coordinates}
-                title={"Visto pela última vez: " + hive.lastSeen}
-              >
-                <Image
-                  style={{ width: 35, height: 35 }}
-                  source={require("../../assets/hive-map-icon.png")}
-                />
-              </MapView.Marker>
-            );
+          {this.props.markers.map(marker => {
+            return this._handleMarkers(marker);
           })}
         </MapView>
         <Fab
@@ -140,10 +182,10 @@ class NewHive extends React.Component {
         >
           <Icon name="add" color={"#4A4A4A"} />
           <Button
-            style={{ backgroundColor: "transparent" }}
+            style={{ backgroundColor: "#4A4A4A" }}
             onPress={() => {
               this.props.toggleNewHiveFormModal();
-              this._handleNewMarker();
+              this._handleNewMarker("hive");
             }}
           >
             <Image
@@ -151,8 +193,21 @@ class NewHive extends React.Component {
               source={require("../../assets/hive-map-icon.png")}
             />
           </Button>
+          <Button
+            style={{ backgroundColor: "#4A4A4A" }}
+            onPress={() => {
+              this.props.toggleNewBeeFormModal();
+              this._handleNewMarker("bee");
+            }}
+          >
+            <Image
+              style={{ width: 35, height: 35 }}
+              source={require("../../assets/one-bee.png")}
+            />
+          </Button>
         </Fab>
         <NewHiveFormModal />
+        <NewBeeFormModal />
       </View>
     );
   }
@@ -171,12 +226,15 @@ const styles = StyleSheet.create({
 
 mapStateToProps = state => {
   return {
-    showNewHiveFormModal: state.ModalReducer.showNewHiveFormModal,
-    hives: state.HiveReducer.hives
+    markers: state.MarkerReducer.markers
   };
 };
 
 export default connect(
   mapStateToProps,
-  { toggleNewHiveFormModal, newHive, prepareNewHive }
+  {
+    toggleNewHiveFormModal,
+    prepareNewMarker,
+    toggleNewBeeFormModal
+  }
 )(NewHive);

@@ -12,7 +12,7 @@ export default class Home extends React.Component {
         />
         <Text h4 style={styles.label}>
           {" "}
-          Oi Luís, você já nos ajudou a cadastrar 13 coméias!
+          Oi Luís, você já nos ajudou a cadastrar 13 colméias!
         </Text>
       </View>
     );
