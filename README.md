@@ -25,3 +25,21 @@ expo start
 If you don`t have Expo yet, follow the Expo instrunctions:
 
 docs.expo.io
+
+#Backend
+
+----Technologies----
+
+**JDK8
+
+**Apache Maven 3.5.4
+
+**Postgres 9.5
+
+
+----Settings----
+
+*Import the backend project
+
+*Configure the file application.properties according to your local settings
+
